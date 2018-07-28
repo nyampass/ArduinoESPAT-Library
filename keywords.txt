@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map for HaLakeKit
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ESPAT KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin KEYWORD2
+checkAT KEYWORD2
+changeMode KEYWORD2
+tryConnectAP KEYWORD2
+get KEYWORD2
+sendComm KEYWORD2
+clientIP KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
