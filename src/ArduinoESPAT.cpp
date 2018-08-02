@@ -52,10 +52,19 @@ bool ESPAT::tryConnectAP(){
   if(!INIT) return false;
   if(true){ // clientIP() == ""
     ss->println("AT+CWJAP_CUR=\"" + SSID + "\",\"" + PASS + "\"");
-    
-    atdelay(10000);
-    ss->readString(); // reset buff
-    // Serial.println(ss->readString());
+
+    int limit = 10;
+
+    while(true){
+      atdelay(3000);
+
+      String data = ss->readString();
+
+      Serial.println(data + " hogehoge");
+      if(checkStrByOk(data) || data.indexOf("ERROR") >= 0){
+        break;
+      }
+    }
     if(clientIP() != ""){
       return true;
     }else{
