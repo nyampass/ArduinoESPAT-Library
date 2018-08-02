@@ -14,6 +14,29 @@ void ESPAT::atdelay(int limit){
   }
 }
 
+bool ESPAT::waitResp(uint8_t limit){
+  uint8_t cnt = 0;
+
+  while(true){
+    atdelay(3000);
+    String data = ss->readString();
+
+    // Serial.println(data);
+
+    if(cnt > limit){break;}
+
+    if(checkStrByOk(data)){
+      return true;
+      break;
+    }else if(data.indexOf("ERROR") >= 0){
+      return false;
+
+      break;
+    }
+    cnt += 1;
+  }
+}
+
 bool ESPAT::begin(){
   ss->begin(115200);
   // Serial.begin(115200);
@@ -57,10 +80,8 @@ bool ESPAT::tryConnectAP(){
 
     while(true){
       atdelay(3000);
-
       String data = ss->readString();
 
-      Serial.println(data + " hogehoge");
       if(checkStrByOk(data) || data.indexOf("ERROR") >= 0){
         break;
       }
@@ -84,25 +105,25 @@ String ESPAT::get(String uri){
   String host = buff[0];
   String url = buff[1];
 
-  if(clientIP() != "no IP"){
+  if(clientIP() != ""){
     ss->println("AT+CIPSTART=\"TCP\",\""+ host +"\",80");
-    atdelay(4000);
-    if(checkStrByOk(ss->readString())){
+    // atdelay(4000);
+    if(waitResp(5)){
       // Serial.println("TCP OK");
       ss->println("AT+CIPMODE=1");
-      atdelay(500);
-      if(checkStrByOk(ss->readString())){
+      // atdelay(500);
+      if(waitResp(5)){
         // Serial.println("MODE OK");
         ss->println("AT+CIPSEND");
-        atdelay(1000);
-        if(checkStrByOk(ss->readString())){
+        // atdelay(1000);
+        if(waitResp(5)){
           // Serial.println("SEND READY");
           ss->println("GET "+ url +" HTTP/1.1\nHOST:"+ host +"\n");
           atdelay(4000);
           while(ss->available()){
             result += (char)ss->read();
+            atdelay(1000);
           }
-          // Serial.println(result);
           ss->print("+++");
           atdelay(1000);
           ss->readString(); // reset buff
