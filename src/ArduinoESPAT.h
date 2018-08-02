@@ -22,6 +22,7 @@ class ESPAT{
     bool INIT = false;
     bool analysisUri(String *buff, String uri);
     bool checkStrByOk(String s);
+    void atdelay(int limit);
 
     SoftwareSerial *ss = new SoftwareSerial(2, 3);
 };

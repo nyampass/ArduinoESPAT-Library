@@ -5,21 +5,30 @@ ESPAT::ESPAT(String ssid, String pass){
   PASS = pass;
 }
 
+void ESPAT::atdelay(int limit){
+  int cnt = 0;
+
+  while(!ss->available() && cnt < limit){
+    cnt += 1;
+    delay(1);
+  }
+}
+
 bool ESPAT::begin(){
   ss->begin(115200);
   // Serial.begin(115200);
   ss->println("AT+RST");
-  delay(3000);
+  atdelay(3000);
   ss->readString();
   ss->println("AT+UART_CUR=9600,8,1,0,0");
-  delay(1000);
+  atdelay(1000);
   ss->readString();
   ss->println("AT+CWDHCP_DEF=1,1");
-  delay(1000);
+  atdelay(1000);
   ss->readString();
 
   ss->begin(9600);
-  delay(10);
+  atdelay(10);
   if(checkAT()){
     INIT = true;
   }
@@ -28,14 +37,14 @@ bool ESPAT::begin(){
 
 bool ESPAT::checkAT(){
   ss->println("AT");
-  delay(500);
+  atdelay(500);
   return checkStrByOk(ss->readString());
 }
 
 bool ESPAT::changeMode(uint8_t mode){
   if(!INIT) return false;
   ss->println("AT+CWMODE_CUR=" + String(mode));
-  delay(2000);
+  atdelay(2000);
   return checkStrByOk(ss->readString());
 }
 
@@ -43,7 +52,8 @@ bool ESPAT::tryConnectAP(){
   if(!INIT) return false;
   if(true){ // clientIP() == ""
     ss->println("AT+CWJAP_CUR=\"" + SSID + "\",\"" + PASS + "\"");
-    delay(10000);
+    
+    atdelay(10000);
     ss->readString(); // reset buff
     // Serial.println(ss->readString());
     if(clientIP() != ""){
@@ -67,28 +77,28 @@ String ESPAT::get(String uri){
 
   if(clientIP() != "no IP"){
     ss->println("AT+CIPSTART=\"TCP\",\""+ host +"\",80");
-    delay(4000);
+    atdelay(4000);
     if(checkStrByOk(ss->readString())){
       // Serial.println("TCP OK");
       ss->println("AT+CIPMODE=1");
-      delay(500);
+      atdelay(500);
       if(checkStrByOk(ss->readString())){
         // Serial.println("MODE OK");
         ss->println("AT+CIPSEND");
-        delay(1000);
+        atdelay(1000);
         if(checkStrByOk(ss->readString())){
           // Serial.println("SEND READY");
           ss->println("GET "+ url +" HTTP/1.1\nHOST:"+ host +"\n");
-          delay(4000);
+          atdelay(4000);
           while(ss->available()){
             result += (char)ss->read();
           }
           // Serial.println(result);
           ss->print("+++");
-          delay(1000);
+          atdelay(1000);
           ss->readString(); // reset buff
           ss->println("AT+CIPCLOSE");
-          delay(1000);
+          atdelay(1000);
           ss->readString(); // reset buff
           // Serial.println(ss->readString());
           return result;
@@ -113,7 +123,7 @@ String ESPAT::clientIP(){
   int pos = 0;
 
   ss->println("AT+CIFSR");
-  delay(2000);
+  atdelay(2000);
   resp = ss->readString();
   pos = resp.indexOf("+CIFSR:STAIP,\"");
 
@@ -145,7 +155,7 @@ bool ESPAT::checkStrByOk(String s){
 String ESPAT::sendComm(String comm, int wait = 2000){
   if(!INIT) return "";
   ss->println(comm);
-  delay(wait);
+  atdelay(wait);
   return ss->readString();
 }
 
