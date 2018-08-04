@@ -12,7 +12,7 @@ class ESPAT{
     bool checkAT();
     bool changeMode(uint8_t mode);
     bool tryConnectAP();
-    String get(String uri);
+    bool get(String host, String path, int port);
     String clientIP();
     String sendComm(String comm, int wait = 2000);
 

@@ -96,14 +96,14 @@ bool ESPAT::tryConnectAP(){
   }
 }
 
-String ESPAT::get(String uri){
+bool ESPAT::get(String host, String path, int port){ // host path port callback || host path callback
   if(!INIT) return "";
   String result = "";
   String buff[2] = {};
 
-  analysisUri(buff, uri);
-  String host = buff[0];
-  String url = buff[1];
+  // analysisUri(buff, uri);
+  // String host = buff[0];
+  // String url = buff[1];
 
   if(clientIP() != ""){
     ss->println("AT+CIPSTART=\"TCP\",\""+ host +"\",80");
@@ -118,11 +118,14 @@ String ESPAT::get(String uri){
         // atdelay(1000);
         if(waitResp(5)){
           // Serial.println("SEND READY");
-          ss->println("GET "+ url +" HTTP/1.1\nHOST:"+ host +"\n");
+          ss->println("GET "+ path +" HTTP/1.0\nHOST:"+ host +"\n");
           atdelay(4000);
           while(ss->available()){
-            result += (char)ss->read();
-            atdelay(1000);
+            char readData = (char)ss->read();
+
+            Serial.print(readData);
+            // result += readData;
+            atdelay(3000);
           }
           ss->print("+++");
           atdelay(1000);
@@ -131,18 +134,18 @@ String ESPAT::get(String uri){
           atdelay(1000);
           ss->readString(); // reset buff
           // Serial.println(ss->readString());
-          return result;
+          return true;
         }else{
-          return result;
+          return false;
         }
       }else{
-        return result;
+        return false;
       }
     }else{
-      return result;
+      return false;
     }
   }else{
-    return result;
+    return false;
   }
 }
 
