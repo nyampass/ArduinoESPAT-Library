@@ -199,10 +199,35 @@ bool ESPAT::openServer(int port){
 
             line += c;
             if(c == '\n'){
-              if(line.indexOf("GET") >= 0){
-                line = line.substring(line.indexOf("GET") + 4);
-                line = line.substring(0, line.indexOf("HTTP/1") - 1);
-                Serial.println(line);
+              Serial.println(line);
+              if(line.indexOf("GET") >= 0 && line.indexOf("+IPD,") == 0){
+                String path = "";
+                String response = "";
+                int8_t id = 0;
+
+                path = line.substring(line.indexOf("GET") + 4);
+                path = path.substring(0, path.indexOf("HTTP/1") - 1);
+                id = s2i(line.substring(5, 6));
+
+                Serial.println(path);
+                Serial.println(id);
+
+                response = "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nKeep-Alive: timeout=15, max=100\r\n\r\n<html><body>hogehoge</body></html>";
+
+                ss->println("AT+CIPSEND=" + String(id) + "," + response.length());
+                delay(1000);
+                ss->println(response);
+                delay(1000);
+                ss->println("AT+CIPCLOSE=" + String(id));
+                // if(waitResp(5)){
+                //   Serial.println("hogehoge");
+                //   ss->println(response);
+                //   atdelay(5000);
+                //   if(waitResp(5)){
+                //     ss->println("AT+CIPCLOSE=" + String(id));
+                //     waitResp(5);
+                //   }
+                // }
               }
               line = "";
             }
@@ -252,4 +277,16 @@ bool ESPAT::analysisUri(String *buff, String uri){
   *(buff + 1) = url;
 
   return true;
+}
+
+int ESPAT::s2i(String str){
+  if(str == ""){
+    return -1;
+  }
+  for(int i = 0; i < str.length(); i++){
+    if(String((int)(str[i] - '0')) != String(str[i])){
+      return -1;
+    }
+  }
+  return str.toInt();
 }

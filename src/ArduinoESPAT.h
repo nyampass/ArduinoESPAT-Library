@@ -26,6 +26,7 @@ class ESPAT{
     bool checkStrByOk(String s);
     bool waitResp(uint8_t limit);
     void atdelay(int limit);
+    int s2i(String str);
 
     SoftwareSerial *ss = new SoftwareSerial(2, 3);
 };
