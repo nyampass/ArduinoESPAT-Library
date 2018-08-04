@@ -61,12 +61,21 @@ if(espat.clientIP() != ""){
 }
 ```
 
-## get(String uri): String
+## get(String host, String path, optional int port, optional void (\*callback)(char)): bool
 This method send GET request.
 
 Caution!!: You should call tryConnectAP before this method.  
 Caution!!: You also hove to check client IP address is valid by call clientIP().  
 
+**Arguments**
+
+* optional int port: Default is 80.
+* optional void (\*callback)(char): Argument of callback is response by character.
+
 ```c
-espat.get("www.google.co.jp"); // Return response.
+espat.get("www.google.co.jp", "/", 80); // response is displayed by serial monitor.  
+void callback(char c){
+  Serial.print(c);
+}
+espat.get("www.google.co.jp", "/", 80, callback) // same with previous call.
 ```
