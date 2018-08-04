@@ -21,7 +21,7 @@ bool ESPAT::waitResp(uint8_t limit){
     atdelay(3000);
     String data = ss->readString();
 
-    // Serial.println(data);
+    Serial.println(data);
 
     if(cnt > limit){break;}
 
@@ -66,6 +66,7 @@ bool ESPAT::checkAT(){
 
 bool ESPAT::changeMode(uint8_t mode){
   if(!INIT) return false;
+  Serial.println(String(mode));
   ss->println("AT+CWMODE_CUR=" + String(mode));
   atdelay(2000);
   return checkStrByOk(ss->readString());
@@ -173,6 +174,47 @@ String ESPAT::clientIP(){
     return result;
   }else{
     return "";
+  }
+}
+
+bool ESPAT::openServer(int port){
+  String line = "";
+
+  if(!SERVER){
+    if(clientIP() == ""){
+      if(!tryConnectAP()){
+        return false;
+      }
+    }
+
+    ss->println("AT+CIPMUX=1");
+    if(waitResp(5)){
+      ss->println("AT+CIPSERVER=1," + String(port));
+      if(waitResp(5)){
+        atdelay(1000);
+        SERVER = true;
+        while(SERVER){
+          while(ss->available()){
+            char c = ss->read();
+
+            line += c;
+            if(c == '\n'){
+              if(line.indexOf("GET") >= 0){
+                line = line.substring(line.indexOf("GET") + 4);
+                line = line.substring(0, line.indexOf("HTTP/1") - 1);
+                Serial.println(line);
+              }
+              line = "";
+            }
+            atdelay(3000);
+          }
+        }
+      }else{
+        return false;
+      }
+    }else{
+      return false;
+    }
   }
 }
 
