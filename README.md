@@ -1,5 +1,5 @@
 # ArduinoESPAT
-A library to control esp-8266 from Arduino by AT commands easie.
+A library to control esp-8266 from Arduino by AT commands easier.
 
 # Usage
 ## Definition
@@ -38,7 +38,6 @@ espat.changeMode(1); // Wifi is station mode.
 This method connect with AP.  
 
 Caution!!: You should set correct ssid and passwd at Definition.  
-Caution!!: You should set station mode by changeMode mothod.
 ```c
 espat.changeMode(1) // set station mode
 espat.tryConnectAP();

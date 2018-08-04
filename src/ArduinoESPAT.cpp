@@ -72,6 +72,7 @@ bool ESPAT::changeMode(uint8_t mode){
 }
 
 bool ESPAT::tryConnectAP(){
+  changeMode(1);
   if(!INIT) return false;
   if(true){ // clientIP() == ""
     ss->println("AT+CWJAP_CUR=\"" + SSID + "\",\"" + PASS + "\"");
