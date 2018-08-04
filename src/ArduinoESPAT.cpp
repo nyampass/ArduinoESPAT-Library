@@ -96,17 +96,11 @@ bool ESPAT::tryConnectAP(){
   }
 }
 
-bool ESPAT::get(String host, String path, int port){ // host path port callback || host path callback
+bool ESPAT::get(String host, String path, int port = 80, void (*ptf)(char) = nullptr){ // host path port callback || host path callback
   if(!INIT) return "";
-  String result = "";
-  String buff[2] = {};
-
-  // analysisUri(buff, uri);
-  // String host = buff[0];
-  // String url = buff[1];
 
   if(clientIP() != ""){
-    ss->println("AT+CIPSTART=\"TCP\",\""+ host +"\",80");
+    ss->println("AT+CIPSTART=\"TCP\",\""+ host +"\"," + String(port));
     // atdelay(4000);
     if(waitResp(5)){
       // Serial.println("TCP OK");
@@ -123,8 +117,12 @@ bool ESPAT::get(String host, String path, int port){ // host path port callback 
           while(ss->available()){
             char readData = (char)ss->read();
 
-            Serial.print(readData);
-            // result += readData;
+            if(ptf == nullptr){
+              Serial.print(readData);
+            }else{
+              ptf(readData);
+            }
+            // Serial.print(readData);
             atdelay(3000);
           }
           ss->print("+++");
