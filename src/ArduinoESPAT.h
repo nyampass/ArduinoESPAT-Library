@@ -20,12 +20,14 @@ class ESPAT{
     String clientIP();
     String sendComm(String comm, int wait = 2000);
     void setGetRecieveEvents(String path, String html, void (*access)());
+    void breakServer();
 
   private:
     String SSID;
     String PASS;
     bool INIT = false;
     bool SERVER = false;
+    bool SERVER_FORCE_SHUT = false;
     bool analysisUri(String *buff, String uri);
     bool checkStrByOk(String s);
     bool waitResp(uint8_t limit);

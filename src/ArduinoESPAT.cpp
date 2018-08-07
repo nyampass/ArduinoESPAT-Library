@@ -180,7 +180,7 @@ String ESPAT::clientIP(){
 bool ESPAT::openServer(int port, void (*opened)()){
   String line = "";
 
-  if(!SERVER){
+  if(!SERVER && INIT){
     if(clientIP() == NOIP){
       if(!tryConnectAP()){
         return false;
@@ -196,6 +196,12 @@ bool ESPAT::openServer(int port, void (*opened)()){
         while(SERVER){
           while(ss->available()){
             char c = ss->read();
+
+            if(SERVER_FORCE_SHUT){
+              SERVER = false;
+              SERVER_FORCE_SHUT = false;
+              return true;
+            }
 
             line += c;
             if(c == '\n'){
@@ -240,6 +246,12 @@ bool ESPAT::openServer(int port, void (*opened)()){
     }else{
       return false;
     }
+  }
+}
+
+void ESPAT::breakServer(){
+  if(SERVER){
+    SERVER_FORCE_SHUT = true;
   }
 }
 
