@@ -5,6 +5,7 @@
 #include <SoftwareSerial.h>
 
 #define NOIP "0.0.0.0"
+#define EVENTS_AMOUNT 10
 
 class SoftwareSerial;
 class ESPAT{
@@ -18,6 +19,7 @@ class ESPAT{
     bool openServer(int port);
     String clientIP();
     String sendComm(String comm, int wait = 2000);
+    void setGetRecieveEvents(String path, String html, void (*access)());
 
   private:
     String SSID;
@@ -29,6 +31,14 @@ class ESPAT{
     bool waitResp(uint8_t limit);
     void atdelay(int limit);
     int s2i(String str);
+
+    uint8_t GetRecieveEventsNext = 0;
+    struct GetRecieveEvent{
+      void (*access)();
+      String path;
+      String html;
+    };
+    struct GetRecieveEvent GetRecieveEvents[EVENTS_AMOUNT];
 
     SoftwareSerial *ss = new SoftwareSerial(2, 3);
 };

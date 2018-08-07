@@ -204,6 +204,7 @@ bool ESPAT::openServer(int port){
               if(line.indexOf("GET") >= 0 && line.indexOf("+IPD,") == 0){
                 String path = "";
                 String response = "";
+                String html = "";
                 int8_t id = 0;
 
                 path = line.substring(line.indexOf("GET") + 4);
@@ -213,12 +214,20 @@ bool ESPAT::openServer(int port){
                 Serial.println(path);
                 Serial.println(id);
 
-                response = "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nKeep-Alive: timeout=15, max=100\r\n\r\n<html><body>hogehoge</body></html>";
+                for(int i = 0;  i < GetRecieveEventsNext; i++){
+                  if(GetRecieveEvents[i].path == path){
+                    GetRecieveEvents[i].access();
+                    html = GetRecieveEvents[i].html;
+                  }
+                }
 
+                response = "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nKeep-Alive: timeout=15, max=100\r\n\r\n" + html;
                 ss->println("AT+CIPSEND=" + String(id) + "," + response.length());
-                waitResp(3);
+                // waitResp(3);
+                delay(500);
                 ss->println(response);
-                delay(1000);
+                // waitResp(5);
+                delay(500);
                 ss->println("AT+CIPCLOSE=" + String(id));
               }
               line = "";
@@ -233,6 +242,16 @@ bool ESPAT::openServer(int port){
       return false;
     }
   }
+}
+
+void ESPAT::setGetRecieveEvents(String path, String html, void (*access)()){
+  struct GetRecieveEvent event;
+
+  event.access = access;
+  event.path = path;
+  event.html = html;
+  GetRecieveEvents[GetRecieveEventsNext] = event;
+  GetRecieveEventsNext += 1;
 }
 
 bool ESPAT::checkStrByOk(String s){
