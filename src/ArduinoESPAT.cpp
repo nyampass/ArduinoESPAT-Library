@@ -177,7 +177,7 @@ String ESPAT::clientIP(){
   }
 }
 
-bool ESPAT::openServer(int port){
+bool ESPAT::openServer(int port, void (*opened)()){
   String line = "";
 
   if(!SERVER){
@@ -186,14 +186,13 @@ bool ESPAT::openServer(int port){
         return false;
       }
     }
-
-    Serial.println(clientIP());
     ss->println("AT+CIPMUX=1");
     if(waitResp(5)){
       ss->println("AT+CIPSERVER=1," + String(port));
       if(waitResp(5)){
         atdelay(1000);
         SERVER = true;
+        if(opened != nullptr) opened();
         while(SERVER){
           while(ss->available()){
             char c = ss->read();

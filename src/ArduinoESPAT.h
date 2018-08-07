@@ -16,7 +16,7 @@ class ESPAT{
     bool changeMode(uint8_t mode);
     bool tryConnectAP();
     bool get(String host, String path, int port = 80, void (*ptf)(char) = nullptr);
-    bool openServer(int port);
+    bool openServer(int port, void (*opened)() = nullptr);
     String clientIP();
     String sendComm(String comm, int wait = 2000);
     void setGetRecieveEvents(String path, String html, void (*access)());
