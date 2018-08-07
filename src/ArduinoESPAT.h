@@ -5,7 +5,7 @@
 #include <SoftwareSerial.h>
 
 #define NOIP "0.0.0.0"
-#define EVENTS_AMOUNT 10
+#define GET_RECV_EVENTS_LIMIT 10
 
 class SoftwareSerial;
 class ESPAT{
@@ -38,7 +38,7 @@ class ESPAT{
       String path;
       String html;
     };
-    struct GetRecieveEvent GetRecieveEvents[EVENTS_AMOUNT];
+    struct GetRecieveEvent GetRecieveEvents[GET_RECV_EVENTS_LIMIT];
 
     SoftwareSerial *ss = new SoftwareSerial(2, 3);
 };

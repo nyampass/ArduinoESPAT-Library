@@ -246,11 +246,13 @@ bool ESPAT::openServer(int port, void (*opened)()){
 void ESPAT::setGetRecieveEvents(String path, String html, void (*access)()){
   struct GetRecieveEvent event;
 
-  event.access = access;
-  event.path = path;
-  event.html = html;
-  GetRecieveEvents[GetRecieveEventsNext] = event;
-  GetRecieveEventsNext += 1;
+  if(GetRecieveEventsNext < GET_RECV_EVENTS_LIMIT){
+    event.access = access;
+    event.path = path;
+    event.html = html;
+    GetRecieveEvents[GetRecieveEventsNext] = event;
+    GetRecieveEventsNext += 1;
+  }
 }
 
 bool ESPAT::checkStrByOk(String s){
