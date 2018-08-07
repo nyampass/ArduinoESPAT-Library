@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
+#define NOIP "0.0.0.0"
+
 class SoftwareSerial;
 class ESPAT{
   public:

@@ -18,10 +18,10 @@ bool ESPAT::waitResp(uint8_t limit){
   uint8_t cnt = 0;
 
   while(true){
-    atdelay(3000);
+    atdelay(500);
     String data = ss->readString();
 
-    Serial.println(data);
+    // Serial.println(data);
 
     if(cnt > limit){break;}
 
@@ -181,12 +181,13 @@ bool ESPAT::openServer(int port){
   String line = "";
 
   if(!SERVER){
-    if(clientIP() == ""){
+    if(clientIP() == NOIP){
       if(!tryConnectAP()){
         return false;
       }
     }
 
+    Serial.println(clientIP());
     ss->println("AT+CIPMUX=1");
     if(waitResp(5)){
       ss->println("AT+CIPSERVER=1," + String(port));
@@ -215,23 +216,14 @@ bool ESPAT::openServer(int port){
                 response = "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nKeep-Alive: timeout=15, max=100\r\n\r\n<html><body>hogehoge</body></html>";
 
                 ss->println("AT+CIPSEND=" + String(id) + "," + response.length());
-                delay(1000);
+                waitResp(3);
                 ss->println(response);
                 delay(1000);
                 ss->println("AT+CIPCLOSE=" + String(id));
-                // if(waitResp(5)){
-                //   Serial.println("hogehoge");
-                //   ss->println(response);
-                //   atdelay(5000);
-                //   if(waitResp(5)){
-                //     ss->println("AT+CIPCLOSE=" + String(id));
-                //     waitResp(5);
-                //   }
-                // }
               }
               line = "";
             }
-            atdelay(3000);
+            atdelay(100000);
           }
         }
       }else{
