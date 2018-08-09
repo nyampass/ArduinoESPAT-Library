@@ -76,7 +76,6 @@ bool ESPAT::changeMode(uint8_t mode){
   ss->listen();
 
   if(!INIT) return false;
-  Serial.println(String(mode));
   ss->println("AT+CWMODE_CUR=" + String(mode));
   atdelay(2000);
   return checkStrByOk(ss->readString());
@@ -224,20 +223,37 @@ bool ESPAT::openServer(int port, void (*opened)()){
 
             line += c;
             if(c == '\n'){
-              Serial.println(line);
+              // Serial.println(line);
               if(line.indexOf("GET") >= 0 && line.indexOf("+IPD,") == 0){
                 String path = "";
+                String queryStr = "";
+                String query[2] = {"", ""};
                 String response = "";
-                String html = "";
+                String html = "404";
                 int8_t id = 0;
-                void (*callback)() = nullptr;
+                void (*callback)(String, String) = nullptr;
 
                 path = line.substring(line.indexOf("GET") + 4);
                 path = path.substring(0, path.indexOf("HTTP/1") - 1);
                 id = s2i(line.substring(5, 6));
 
+                if(path.indexOf("?") >= 0){
+                  uint8_t queryStart = path.indexOf("?");
+                  queryStr = path.substring(queryStart + 1);
+                  path = path.substring(0, queryStart);
+
+                  if(queryStr.indexOf("=") >= 0){
+                    uint8_t equal = queryStr.indexOf("=");
+
+                    query[0] = queryStr.substring(0, equal);
+                    query[1] = queryStr.substring(equal + 1);
+                  }
+                }
+
                 Serial.println(path);
                 Serial.println(id);
+                Serial.println(query[0]);
+                Serial.println(query[1]);
 
                 for(int i = 0;  i < GetRecieveEventsNext; i++){
                   if(GetRecieveEvents[i].path == path){
@@ -247,7 +263,6 @@ bool ESPAT::openServer(int port, void (*opened)()){
                   }
                 }
 
-                if(html == "") html = "404";
                 response = "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nKeep-Alive: timeout=15, max=100\r\n\r\n" + html;
                 ss->listen();
                 ss->println("AT+CIPSEND=" + String(id) + "," + response.length());
@@ -256,7 +271,7 @@ bool ESPAT::openServer(int port, void (*opened)()){
                 delay(500);
                 ss->println("AT+CIPCLOSE=" + String(id));
 
-                if(callback != nullptr) callback();
+                if(callback != nullptr) callback(query[0], query[1]);
               }
               line = "";
             }
