@@ -8,6 +8,8 @@ ESPAT::ESPAT(String ssid, String pass){
 void ESPAT::atdelay(int limit){
   int cnt = 0;
 
+  ss->listen();
+
   while(!ss->available() && cnt < limit){
     cnt += 1;
     delay(1);
@@ -16,6 +18,8 @@ void ESPAT::atdelay(int limit){
 
 bool ESPAT::waitResp(uint8_t limit){
   uint8_t cnt = 0;
+
+  ss->listen();
 
   while(true){
     atdelay(500);
@@ -38,6 +42,8 @@ bool ESPAT::waitResp(uint8_t limit){
 }
 
 bool ESPAT::begin(){
+  ss->listen();
+
   ss->begin(115200);
   // Serial.begin(115200);
   ss->println("AT+RST");
@@ -59,12 +65,16 @@ bool ESPAT::begin(){
 }
 
 bool ESPAT::checkAT(){
+  ss->listen();
+
   ss->println("AT");
   atdelay(500);
   return checkStrByOk(ss->readString());
 }
 
 bool ESPAT::changeMode(uint8_t mode){
+  ss->listen();
+
   if(!INIT) return false;
   Serial.println(String(mode));
   ss->println("AT+CWMODE_CUR=" + String(mode));
@@ -73,6 +83,8 @@ bool ESPAT::changeMode(uint8_t mode){
 }
 
 bool ESPAT::tryConnectAP(){
+  ss->listen();
+
   changeMode(1);
   if(!INIT) return false;
   if(true){ // clientIP() == ""
@@ -99,6 +111,8 @@ bool ESPAT::tryConnectAP(){
 }
 
 bool ESPAT::get(String host, String path, int port = 80, void (*ptf)(char) = nullptr){ // host path port callback || host path callback
+  ss->listen();
+
   if(!INIT) return "";
 
   if(clientIP() != ""){
@@ -150,6 +164,8 @@ bool ESPAT::get(String host, String path, int port = 80, void (*ptf)(char) = nul
 }
 
 String ESPAT::clientIP(){
+  ss->listen();
+
   if(!INIT) return "";
   String resp = "";
   String result = "";
@@ -178,7 +194,10 @@ String ESPAT::clientIP(){
 }
 
 bool ESPAT::openServer(int port, void (*opened)()){
+  ss->listen();
+
   String line = "";
+  void (*callback)();
 
   if(!SERVER && INIT){
     if(clientIP() == NOIP){
@@ -193,6 +212,7 @@ bool ESPAT::openServer(int port, void (*opened)()){
         atdelay(1000);
         SERVER = true;
         if(opened != nullptr) opened();
+        ss->listen();
         while(SERVER){
           while(ss->available()){
             char c = ss->read();
@@ -221,19 +241,21 @@ bool ESPAT::openServer(int port, void (*opened)()){
 
                 for(int i = 0;  i < GetRecieveEventsNext; i++){
                   if(GetRecieveEvents[i].path == path){
-                    GetRecieveEvents[i].access();
+                    callback = GetRecieveEvents[i].access;
                     html = GetRecieveEvents[i].html;
+                    break;
                   }
                 }
 
                 response = "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nKeep-Alive: timeout=15, max=100\r\n\r\n" + html;
+                ss->listen();
                 ss->println("AT+CIPSEND=" + String(id) + "," + response.length());
-                // waitResp(3);
                 delay(500);
                 ss->println(response);
-                // waitResp(5);
                 delay(500);
                 ss->println("AT+CIPCLOSE=" + String(id));
+
+                callback();
               }
               line = "";
             }
@@ -250,6 +272,8 @@ bool ESPAT::openServer(int port, void (*opened)()){
 }
 
 void ESPAT::breakServer(){
+  ss->listen();
+
   if(SERVER){
     SERVER_FORCE_SHUT = true;
   }
@@ -257,6 +281,8 @@ void ESPAT::breakServer(){
 
 void ESPAT::setGetRecieveEvents(String path, String html, void (*access)()){
   struct GetRecieveEvent event;
+
+  ss->listen();
 
   if(GetRecieveEventsNext < GET_RECV_EVENTS_LIMIT){
     event.access = access;
@@ -268,6 +294,8 @@ void ESPAT::setGetRecieveEvents(String path, String html, void (*access)()){
 }
 
 bool ESPAT::checkStrByOk(String s){
+  ss->listen();
+
   if(s.indexOf("OK") >= 0){
     return true;
   }else{
@@ -276,6 +304,8 @@ bool ESPAT::checkStrByOk(String s){
 }
 
 String ESPAT::sendComm(String comm, int wait = 2000){
+  ss->listen();
+
   if(!INIT) return "";
   ss->println(comm);
   atdelay(wait);
@@ -285,6 +315,8 @@ String ESPAT::sendComm(String comm, int wait = 2000){
 bool ESPAT::analysisUri(String *buff, String uri){
   String host = "";
   String url = "";
+
+  ss->listen();
 
   for(int i = 0; i < uri.length(); i++){
     if(uri[i] == '/'){
@@ -304,6 +336,8 @@ bool ESPAT::analysisUri(String *buff, String uri){
 }
 
 int ESPAT::s2i(String str){
+  ss->listen();
+
   if(str == ""){
     return -1;
   }
