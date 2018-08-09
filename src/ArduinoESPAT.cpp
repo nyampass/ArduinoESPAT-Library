@@ -197,7 +197,6 @@ bool ESPAT::openServer(int port, void (*opened)()){
   ss->listen();
 
   String line = "";
-  void (*callback)();
 
   if(!SERVER && INIT){
     if(clientIP() == NOIP){
@@ -231,6 +230,7 @@ bool ESPAT::openServer(int port, void (*opened)()){
                 String response = "";
                 String html = "";
                 int8_t id = 0;
+                void (*callback)() = nullptr;
 
                 path = line.substring(line.indexOf("GET") + 4);
                 path = path.substring(0, path.indexOf("HTTP/1") - 1);
@@ -247,6 +247,7 @@ bool ESPAT::openServer(int port, void (*opened)()){
                   }
                 }
 
+                if(html == "") html = "404";
                 response = "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nKeep-Alive: timeout=15, max=100\r\n\r\n" + html;
                 ss->listen();
                 ss->println("AT+CIPSEND=" + String(id) + "," + response.length());
@@ -255,7 +256,7 @@ bool ESPAT::openServer(int port, void (*opened)()){
                 delay(500);
                 ss->println("AT+CIPCLOSE=" + String(id));
 
-                callback();
+                if(callback != nullptr) callback();
               }
               line = "";
             }
