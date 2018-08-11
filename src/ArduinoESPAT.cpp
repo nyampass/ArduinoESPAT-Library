@@ -25,7 +25,7 @@ bool ESPAT::waitResp(uint8_t limit){
     atdelay(500);
     String data = ss->readString();
 
-    // Serial.println(data);
+    Serial.println(data);
 
     if(cnt > limit){break;}
 
@@ -46,8 +46,8 @@ bool ESPAT::begin(){
 
   ss->begin(115200);
   // Serial.begin(115200);
-  ss->println("AT+RST");
-  atdelay(3000);
+  ss->println("AT+RESTORE");
+  delay(2000);
   ss->readString();
   ss->println("AT+UART_CUR=9600,8,1,0,0");
   atdelay(1000);
@@ -61,7 +61,9 @@ bool ESPAT::begin(){
   if(checkAT()){
     INIT = true;
   }
-  return checkAT();
+  changeMode(1);
+  ss->readString();
+  return true;
 }
 
 bool ESPAT::checkAT(){
@@ -77,8 +79,8 @@ bool ESPAT::changeMode(uint8_t mode){
 
   if(!INIT) return false;
   ss->println("AT+CWMODE_CUR=" + String(mode));
-  atdelay(2000);
-  return checkStrByOk(ss->readString());
+
+  return waitResp(5);
 }
 
 bool ESPAT::tryConnectAP(){
@@ -172,7 +174,10 @@ String ESPAT::clientIP(){
 
   ss->println("AT+CIFSR");
   atdelay(2000);
-  resp = ss->readString();
+  while(ss->available()){
+    resp += char(ss->read());
+    atdelay(2000);
+  }
   pos = resp.indexOf("+CIFSR:STAIP,\"");
 
   if(pos >= 0){
@@ -199,6 +204,8 @@ bool ESPAT::openServer(int port, void (*opened)()){
 
   if(!SERVER && INIT){
     if(clientIP() == NOIP){
+      changeMode(1);
+      waitResp(5);
       if(!tryConnectAP()){
         return false;
       }
