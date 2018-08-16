@@ -55,15 +55,12 @@ bool ESPAT::begin(){
   ss->println("AT+CWDHCP_DEF=1,1");
   atdelay(1000);
   ss->readString();
-
   ss->begin(9600);
-  atdelay(10);
-  if(checkAT()){
-    INIT = true;
-  }
+  delay(500);
+  INIT = checkAT();
   changeMode(1);
   ss->readString();
-  return true;
+  return INIT;
 }
 
 bool ESPAT::checkAT(){
