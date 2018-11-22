@@ -1,1 +1,8 @@
 .DS_Store
+.pioenvs
+.piolibdeps
+
+lib/
+.travis.yml
+platformio.ini
+main.cpp

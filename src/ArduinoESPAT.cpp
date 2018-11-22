@@ -108,7 +108,73 @@ bool ESPAT::tryConnectAP(){
   }
 }
 
-bool ESPAT::get(String host, String path, int port = 80, void (*ptf)(char) = nullptr){ // host path port callback || host path callback
+String ESPAT::get(String host, String path, int port = 80){
+  ss->listen();
+  String result;
+  uint16_t cnt = 0;
+  bool flag = false;
+  bool skipCheck = false;
+
+  if(!INIT) return "";
+
+  if(clientIP() != ""){
+    ss->println("AT+CIPSTART=\"TCP\",\""+ host +"\"," + String(port));
+    // atdelay(4000);
+    if(waitResp(5)){
+      // Serial.println("TCP OK");
+      ss->println("AT+CIPMODE=1");
+      // atdelay(500);
+      if(waitResp(5)){
+        // Serial.println("MODE OK");
+        ss->println("AT+CIPSEND");
+        // atdelay(1000);
+        if(waitResp(5)){
+          // Serial.println("SEND READY");
+          ss->println("GET "+ path +" HTTP/1.0\nHOST:"+ host +"\n");
+          atdelay(4000);
+          while(ss->available() && cnt < RESP_BUFF){
+            char readData = (char)ss->read();
+
+            if(skipCheck){
+              // Serial.print(readData);
+              result += readData;
+              cnt += 1;
+            }else{
+              if(readData == '\n'){
+                if(!flag){
+                  flag = true;
+                }
+              }else if(readData == '\r' && flag){
+                skipCheck = true;
+              }else{
+                flag = false;
+              }
+            }
+            atdelay(3000);
+          }
+          ss->print("+++");
+          atdelay(1000);
+          ss->readString(); // reset buff
+          ss->println("AT+CIPCLOSE");
+          atdelay(1000);
+          ss->readString(); // reset buff
+          // Serial.println(ss->readString());
+          return result;
+        }else{
+          return "";
+        }
+      }else{
+        return "";
+      }
+    }else{
+      return "";
+    }
+  }else{
+    return "";
+  }
+}
+
+bool ESPAT::advGet(String host, String path, int port = 80, void (*ptf)(char) = nullptr){ // host path port callback || host path callback
   ss->listen();
 
   if(!INIT) return "";

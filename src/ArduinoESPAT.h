@@ -6,6 +6,7 @@
 
 #define NOIP "0.0.0.0"
 #define GET_RECV_EVENTS_LIMIT 10
+#define RESP_BUFF 1024
 
 class SoftwareSerial;
 class ESPAT{
@@ -15,7 +16,8 @@ class ESPAT{
     bool checkAT();
     bool changeMode(uint8_t mode);
     bool tryConnectAP();
-    bool get(String host, String path, int port = 80, void (*ptf)(char) = nullptr);
+    String get(String host, String path, int port = 80);
+    bool advGet(String host, String path, int port = 80, void (*ptf)(char) = nullptr);
     bool openServer(int port, void (*opened)() = nullptr);
     String clientIP();
     String sendComm(String comm, int wait = 2000);
