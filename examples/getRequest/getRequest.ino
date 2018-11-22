@@ -1,7 +1,6 @@
-#include <SoftwareSerial.h>
 #include "ArduinoESPAT.h"
 
-ESPAT espat("ssid", "passwd");
+ESPAT espat("SSID", "PASSWD"); 
 
 void setup(){
   Serial.begin(115200);
@@ -26,7 +25,8 @@ void setup(){
 
   Serial.println(espat.clientIP());
 
-  Serial.println(espat.get("www.google.com/"));
+  Serial.println(espat.get("hogehoge.com", "/", 80));
+  Serial.println("Finished");
 }
 
 void loop(){
