@@ -60,8 +60,23 @@ if(espat.clientIP() != ""){
 }
 ```
 
-## get(String host, String path, optional int port, optional void (\*callback)(char)): bool
-This method send GET request.
+## get(String host, String path, optional int port): String
+This method send GET request and return Body of Response by String.
+
+Caution!!: You should call tryConnectAP before this method.
+Caution!!: You also hove to check client IP address is valid by call clientIP().
+Caution!!: Limit of return(String) is 1024 chars in default. 
+Caution!!: Return is NOT include header of response. 
+
+**Arguments**
+* optional int port: Default is 80.
+
+```c
+Serial.println(espat.get("www.google.co.jp", "/", 80)); // You can display response to serial monitor.(by 1024 chars);
+```
+
+## advGet(String host, String path, optional int port, optional void (\*callback)(char)): bool
+This method send GET request and you can get response by char in callback. 
 
 Caution!!: You should call tryConnectAP before this method.  
 Caution!!: You also hove to check client IP address is valid by call clientIP().  
@@ -72,7 +87,7 @@ Caution!!: You also hove to check client IP address is valid by call clientIP().
 * optional void (\*callback)(char): Argument of callback is response by character.
 
 ```c
-espat.get("www.google.co.jp", "/", 80); // response is displayed by serial monitor.  
+espat.advGet("www.google.co.jp", "/", 80); // response is displayed by serial monitor.
 void callback(char c){
   Serial.print(c);
 }
