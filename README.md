@@ -1,6 +1,14 @@
 # ArduinoESPAT
 A library to control esp-8266 from Arduino by AT commands easier.
 
+# Wiring Diagram
+![Wiring Diagram](./diagram.jpg "Wiring Diagram")
+|Arduino Uno|ESPr|
+|---|---|
+|5V|Vin|
+|GND|GND|
+|D2|TX|
+|D3|RX
 # Usage
 ## Definition
 You need SSID and password for your Access Point.
