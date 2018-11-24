@@ -63,10 +63,10 @@ if(espat.clientIP() != ""){
 ## get(String host, String path, optional int port): String
 This method send GET request and return Body of Response by String.
 
-Caution!!: You should call tryConnectAP before this method.
-Caution!!: You also hove to check client IP address is valid by call clientIP().
-Caution!!: Limit of return(String) is 1024 chars in default. 
-Caution!!: Return is NOT include header of response. 
+Caution!!: You should call tryConnectAP before this method.  
+Caution!!: You also hove to check client IP address is valid by call clientIP().  
+Caution!!: Limit of return(String) is 1024 chars in default.  
+Caution!!: Return is NOT include header of response.  
 
 **Arguments**
 * optional int port: Default is 80.
