@@ -133,13 +133,13 @@ bool ESPAT::tryConnectAP()
   }
 }
 
-String ESPAT::get(String host, String path, int port = 80)
+String ESPAT::get(String host, String path, int port = 80, bool showHeader = false)
 {
   ss->listen();
   String result;
   uint16_t cnt = 0;
   bool flag = false;
-  bool skipCheck = false;
+  bool skipCheck = !showHeader;
 
   if (!INIT)
     return "";

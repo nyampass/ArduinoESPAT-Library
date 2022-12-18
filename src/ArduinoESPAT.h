@@ -17,7 +17,7 @@ public:
   bool checkAT();
   bool changeMode(uint8_t mode);
   bool tryConnectAP();
-  String get(String host, String path, int port = 80);
+  String get(String host, String path, int port = 80, bool showHeader = false);
   bool advGet(String host, String path, int port = 80, void (*ptf)(char) = nullptr);
   bool openServer(int port, void (*opened)() = nullptr);
   String clientIP();
